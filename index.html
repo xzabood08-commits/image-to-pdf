@@ -5,24 +5,28 @@
     <title>محول الصور إلى PDF</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        :root { --primary: #10b981; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; }
-        @media (prefers-color-scheme: dark) { :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; } }
-        body { font-family: sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
-        .container { background: var(--card); padding: 30px; border-radius: 24px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
-        .upload-area { border: 2px dashed #94a3b8; padding: 40px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; }
-        #fileCount { margin-bottom: 15px; font-weight: bold; color: var(--primary); }
-        button { width: 100%; padding: 15px; border-radius: 12px; border: none; background: var(--primary); color: white; font-weight: bold; cursor: pointer; }
+        :root { --primary: #10b981; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
+        body { font-family: sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        
+        /* هنا التعديل: المربع سيأخذ مساحة أكبر */
+        .container { background: var(--card); padding: 50px 30px; border-radius: 30px; width: 100%; max-width: 600px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        
+        h2 { font-size: 28px; margin-bottom: 20px; }
+        .upload-area { border: 3px dashed #475569; padding: 60px 20px; border-radius: 20px; cursor: pointer; margin-bottom: 25px; transition: 0.3s; }
+        .upload-area:hover { border-color: var(--primary); }
+        #fileCount { margin-bottom: 25px; font-size: 18px; font-weight: bold; color: var(--primary); }
+        button { width: 100%; padding: 20px; border-radius: 16px; border: none; background: var(--primary); color: white; font-size: 18px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>تحويل الصور إلى PDF</h2>
+        <h2>تحويل الصور إلى PDF 📄</h2>
         <div class="upload-area" onclick="document.getElementById('fileInput').click()">
-            📂 اختر الصور
+            📂 اضغط هنا لاختيار الصور
             <input type="file" id="fileInput" multiple accept="image/*" style="display:none" onchange="updateLabel()">
         </div>
-        <div id="fileCount">لم يتم اختيار صور</div>
-        <button onclick="generatePDF()">توليد ملف PDF</button>
+        <div id="fileCount">لم يتم اختيار صور بعد</div>
+        <button onclick="generatePDF()">توليد وتحميل ملف PDF</button>
     </div>
 
     <script>
@@ -34,7 +38,7 @@
         async function generatePDF() {
             const { jsPDF } = window.jspdf;
             const files = document.getElementById('fileInput').files;
-            if (files.length === 0) { alert("اختر الصور أولاً!"); return; }
+            if (files.length === 0) { alert("من فضلك اختر الصور أولاً!"); return; }
 
             const doc = new jsPDF();
             for (let i = 0; i < files.length; i++) {
@@ -44,9 +48,9 @@
                     reader.readAsDataURL(files[i]);
                 });
                 if (i > 0) doc.addPage();
-                doc.addImage(imgData, 'JPEG', 10, 10, 180, 250);
+                doc.addImage(imgData, 'JPEG', 10, 10, 190, 270);
             }
-            doc.save("تحويلاتي.pdf");
+            doc.save("ملفي_الجديد.pdf");
         }
     </script>
 </body>
