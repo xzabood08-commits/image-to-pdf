@@ -2,48 +2,51 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>محول الصور إلى PDF</title>
-    <!-- استيراد مكتبة jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        :root { --primary: #10b981; --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #dbeafe 100%); --card-bg: #ffffff; --text-main: #1e293b; }
-        @media (prefers-color-scheme: dark) { :root { --bg-gradient: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); --card-bg: #1e293b; --text-main: #f8fafc; } }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-gradient); color: var(--text-main); margin: 0; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
-        .container { background: var(--card-bg); padding: 30px; border-radius: 30px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
-        .upload-area { border: 2px dashed #94a3b8; border-radius: 20px; padding: 30px; margin: 20px 0; cursor: pointer; }
-        button { width: 100%; padding: 15px; border-radius: 15px; border: none; background: var(--primary); color: white; font-weight: bold; cursor: pointer; }
+        :root { --primary: #10b981; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; }
+        @media (prefers-color-scheme: dark) { :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; } }
+        body { font-family: sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
+        .container { background: var(--card); padding: 30px; border-radius: 24px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        .upload-area { border: 2px dashed #94a3b8; padding: 40px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; }
+        #fileCount { margin-bottom: 15px; font-weight: bold; color: var(--primary); }
+        button { width: 100%; padding: 15px; border-radius: 12px; border: none; background: var(--primary); color: white; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>محول الصور إلى PDF</h2>
+        <h2>تحويل الصور إلى PDF</h2>
         <div class="upload-area" onclick="document.getElementById('fileInput').click()">
-            <input type="file" id="fileInput" multiple accept="image/*" style="display:none">
-            📂 <span>اضغط هنا لاختيار الصور</span>
+            📂 اختر الصور
+            <input type="file" id="fileInput" multiple accept="image/*" style="display:none" onchange="updateLabel()">
         </div>
-        <button onclick="generatePDF()">توليد وتحميل ملف PDF</button>
+        <div id="fileCount">لم يتم اختيار صور</div>
+        <button onclick="generatePDF()">توليد ملف PDF</button>
     </div>
 
     <script>
+        function updateLabel() {
+            const count = document.getElementById('fileInput').files.length;
+            document.getElementById('fileCount').innerText = `تم اختيار ${count} صورة`;
+        }
+
         async function generatePDF() {
             const { jsPDF } = window.jspdf;
-            const fileInput = document.getElementById('fileInput');
-            if (fileInput.files.length === 0) { alert("يرجى اختيار صور أولاً!"); return; }
+            const files = document.getElementById('fileInput').files;
+            if (files.length === 0) { alert("اختر الصور أولاً!"); return; }
 
             const doc = new jsPDF();
-            for (let i = 0; i < fileInput.files.length; i++) {
-                const file = fileInput.files[i];
-                const imgData = await new Promise((resolve) => {
+            for (let i = 0; i < files.length; i++) {
+                const imgData = await new Promise(r => {
                     const reader = new FileReader();
-                    reader.onload = (e) => resolve(e.target.result);
-                    reader.readAsDataURL(file);
+                    reader.onload = e => r(e.target.result);
+                    reader.readAsDataURL(files[i]);
                 });
-
                 if (i > 0) doc.addPage();
                 doc.addImage(imgData, 'JPEG', 10, 10, 180, 250);
             }
-            doc.save("my-images.pdf");
+            doc.save("تحويلاتي.pdf");
         }
     </script>
 </body>
