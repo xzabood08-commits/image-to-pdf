@@ -5,86 +5,68 @@
     <title>محول PDF الذكي</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
-        
-        :root { --primary: #6366f1; --glass: rgba(255, 255, 255, 0.1); }
-        
-        body { 
-            font-family: 'Tajawal', sans-serif; 
-            background: linear-gradient(135deg, #1e1b4b, #4c1d95); 
-            min-height: 100vh; display: flex; justify-content: center; align-items: center; 
-            margin: 0; color: white;
-        }
-        
-        .container { 
-            background: var(--glass); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1);
-            padding: 40px; border-radius: 40px; width: 90%; max-width: 500px; text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-        }
-
-        h2 { margin-bottom: 25px; font-size: 2rem; background: linear-gradient(to right, #a5b4fc, #e0e7ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        .upload-area { 
-            border: 2px dashed #818cf8; padding: 40px; border-radius: 25px; cursor: pointer;
-            transition: 0.4s; background: rgba(0,0,0,0.1);
-        }
-        .upload-area:hover { background: rgba(99, 102, 241, 0.2); transform: scale(1.02); }
-
-        .btn-group { display: flex; gap: 15px; margin-top: 30px; }
-        button { 
-            flex: 1; padding: 18px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer;
-            transition: 0.3s; font-size: 16px;
-        }
-        .btn-convert { background: var(--primary); color: white; box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4); }
-        .btn-clear { background: transparent; border: 1px solid #ef4444; color: #fca5a5; }
-        
-        #progressBar { width: 100%; height: 8px; background: rgba(0,0,0,0.2); border-radius: 4px; margin: 20px 0; display: none; }
-        #progress { width: 0%; height: 100%; background: #22d3ee; border-radius: 4px; transition: 0.3s; }
+        :root { --primary: #6366f1; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; }
+        body.dark { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
+        body { font-family: 'Tajawal', sans-serif; background: var(--bg); color: var(--text); padding: 20px; transition: 0.3s; }
+        .container { background: var(--card); padding: 30px; border-radius: 30px; max-width: 600px; margin: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin: 20px 0; }
+        .img-card { position: relative; border-radius: 10px; overflow: hidden; border: 2px solid var(--primary); }
+        .img-card img { width: 100%; height: 100px; object-fit: cover; }
+        .del-btn { position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; cursor: pointer; border-radius: 50%; width: 20px; }
+        button { padding: 15px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>تحويل الصور إلى PDF ✨</h2>
-        <div class="upload-area" onclick="document.getElementById('fileInput').click()">
-            <p>📂 اضغط هنا لاختيار الصور</p>
-            <input type="file" id="fileInput" multiple accept="image/*" style="display:none" onchange="updateUI()">
+        <h2>محول PDF الذكي</h2>
+        <button onclick="toggleTheme()">🌓 تبديل الوضع الليلي</button>
+        <div class="upload-area" onclick="document.getElementById('fileInput').click()" style="border: 2px dashed #6366f1; padding: 30px; text-align: center; margin: 20px 0; cursor: pointer;">
+            📂 اختر الصور
+            <input type="file" id="fileInput" multiple accept="image/*" style="display:none" onchange="handleFiles()">
         </div>
-        <div id="fileCount" style="margin-top: 15px; opacity: 0.8;">لم يتم اختيار أي صور</div>
-        <div id="progressBar"><div id="progress"></div></div>
-        
-        <div class="btn-group">
-            <button class="btn-convert" onclick="generatePDF()">بدء التحويل</button>
-            <button class="btn-clear" onclick="clearFiles()">إلغاء</button>
-        </div>
+        <div class="gallery" id="gallery"></div>
+        <button onclick="generatePDF()" style="background: var(--primary); color: white;">توليد PDF النهائي</button>
     </div>
 
     <script>
-        function updateUI() {
-            const count = document.getElementById('fileInput').files.length;
-            document.getElementById('fileCount').innerText = count > 0 ? `تم اختيار ${count} صورة` : "لم يتم اختيار أي صور";
+        let selectedFiles = [];
+        function toggleTheme() { document.body.classList.toggle('dark'); }
+
+        function handleFiles() {
+            const files = Array.from(document.getElementById('fileInput').files);
+            selectedFiles = [...selectedFiles, ...files];
+            renderGallery();
         }
-        function clearFiles() { document.getElementById('fileInput').value = ""; updateUI(); }
+
+        function renderGallery() {
+            const g = document.getElementById('gallery');
+            g.innerHTML = '';
+            selectedFiles.forEach((f, i) => {
+                const div = document.createElement('div');
+                div.className = 'img-card';
+                div.innerHTML = `<img src="${URL.createObjectURL(f)}"><button class="del-btn" onclick="removeFile(${i})">×</button>`;
+                g.appendChild(div);
+            });
+        }
+
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            renderGallery();
+        }
 
         async function generatePDF() {
             const { jsPDF } = window.jspdf;
-            const files = document.getElementById('fileInput').files;
-            if (files.length === 0) { alert("من فضلك اختر الصور أولاً!"); return; }
-
-            const bar = document.getElementById('progressBar'), progress = document.getElementById('progress');
-            bar.style.display = 'block';
             const doc = new jsPDF();
-            for (let i = 0; i < files.length; i++) {
+            for (let i = 0; i < selectedFiles.length; i++) {
                 const imgData = await new Promise(r => {
                     const reader = new FileReader();
                     reader.onload = e => r(e.target.result);
-                    reader.readAsDataURL(files[i]);
+                    reader.readAsDataURL(selectedFiles[i]);
                 });
                 if (i > 0) doc.addPage();
                 doc.addImage(imgData, 'JPEG', 10, 10, 180, 250);
-                progress.style.width = ((i + 1) / files.length) * 100 + "%";
             }
-            doc.save("تحويلاتي_الاحترافية.pdf");
-            bar.style.display = 'none';
+            doc.save("ملفي.pdf");
         }
     </script>
 </body>
