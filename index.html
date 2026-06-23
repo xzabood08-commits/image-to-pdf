@@ -2,61 +2,42 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>محول PDF الاحترافي</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        :root { --primary: #6366f1; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
+        :root { --primary: #6366f1; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; }
         body.dark { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
         
-        body { 
-            font-family: 'Segoe UI', sans-serif; background: var(--bg); 
-            color: var(--text); padding: 20px; margin: 0; min-height: 100vh;
-        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 40px 20px; min-height: 100vh; margin: 0; }
 
-        /* هنا جعلنا البطاقة تأخذ كامل عرض الشاشة مع هوامش بسيطة */
+        /* القياس المتوازن هنا: لا هو صغير جداً ولا هو كامل العرض */
         .container { 
             background: var(--card); padding: 40px; border-radius: 30px; 
-            width: 95%; /* أخذ كامل العرض تقريباً */
-            margin: 0 auto; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            width: 100%; max-width: 700px; /* قياس وسط ومريح للعين */
+            margin: 0 auto; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.15);
         }
 
-        h2 { font-size: 2rem; margin-bottom: 30px; }
-
-        .upload-area { 
-            border: 4px dashed #6366f1; padding: 60px 20px; border-radius: 20px; 
-            cursor: pointer; margin-bottom: 30px; transition: 0.3s;
-        }
-
-        .btn-main { 
-            background: var(--primary); color: white; padding: 20px; 
-            border-radius: 15px; border: none; font-size: 1.2rem; 
-            width: 100%; cursor: pointer; font-weight: bold;
-        }
-        
-        .gallery { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* شبكة مرنة */
-            gap: 20px; margin: 30px 0; 
-        }
-        .img-card { position: relative; border-radius: 15px; overflow: hidden; border: 3px solid var(--primary); }
-        .img-card img { width: 100%; height: 200px; object-fit: cover; }
+        h2 { font-size: 1.8rem; margin-bottom: 25px; }
+        .upload-area { border: 3px dashed #6366f1; padding: 40px 20px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; }
+        .btn-main { background: var(--primary); color: white; padding: 15px 30px; border-radius: 12px; border: none; font-size: 1.1rem; width: 100%; cursor: pointer; font-weight: bold; }
+        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; margin: 20px 0; }
+        .img-card { position: relative; border-radius: 10px; overflow: hidden; border: 2px solid var(--primary); }
+        .img-card img { width: 100%; height: 120px; object-fit: cover; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>أداة تحويل الصور إلى PDF 📄</h2>
-        
-        <button onclick="toggleTheme()" style="padding: 10px 20px; margin-bottom: 20px; border-radius: 10px; border: none; cursor: pointer;">🌓 الوضع الليلي</button>
+        <h2>محول الصور إلى PDF</h2>
+        <button onclick="toggleTheme()" style="margin-bottom: 20px; padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer;">🌓 الوضع الليلي</button>
         
         <div class="upload-area" onclick="document.getElementById('fileInput').click()">
-            📂 اضغط هنا لاختيار صورك
+            📂 اختر صورك
             <input type="file" id="fileInput" multiple accept="image/*" style="display:none" onchange="handleFiles()">
         </div>
 
         <div class="gallery" id="gallery"></div>
         
-        <button class="btn-main" onclick="generatePDF()">توليد ملف PDF النهائي</button>
+        <button class="btn-main" onclick="generatePDF()">توليد ملف PDF</button>
     </div>
 
     <script>
@@ -75,7 +56,7 @@
             selectedFiles.forEach((f, i) => {
                 const div = document.createElement('div');
                 div.className = 'img-card';
-                div.innerHTML = `<img src="${URL.createObjectURL(f)}"><button onclick="removeFile(${i})" style="position:absolute; top:5px; right:5px; background:red; border:none; color:white; border-radius:50%; width:30px; height:30px;">×</button>`;
+                div.innerHTML = `<img src="${URL.createObjectURL(f)}"><button onclick="removeFile(${i})" style="position:absolute; top:2px; right:2px; background:red; border:none; color:white; border-radius:50%; width:20px; height:20px;">×</button>`;
                 g.appendChild(div);
             });
         }
@@ -97,7 +78,7 @@
                 if (i > 0) doc.addPage();
                 doc.addImage(imgData, 'JPEG', 10, 10, 180, 250);
             }
-            doc.save("ملفي_الاحترافي.pdf");
+            doc.save("تحويلاتي.pdf");
         }
     </script>
 </body>
